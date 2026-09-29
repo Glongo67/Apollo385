@@ -1,0 +1,116 @@
+name: Build Apollo 3.8.5 Gallery Slideshow IPA
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+
+    steps:
+      - name: Clone Apollo Reborn 3.8.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone \
+            --depth 20 \
+            https://github.com/Apollo-Reborn/Apollo-Reborn.git \
+            "$RUNNER_TEMP/Apollo-Reborn"
+          cd "$RUNNER_TEMP/Apollo-Reborn"
+          git checkout v1.15.11_3.8.5
+          git submodule update --init --recursive --depth 1
+          echo "Using Apollo Reborn commit: $(git rev-parse --short HEAD)"
+
+      - name: Apply Gallery Slideshow patch
+        shell: bash
+        env:
+          APOLLO_SLIDESHOW_PATCH_B64: "LS0tIGEvc3JjL0Fwb2xsb0dhbGxlcnlJbWFnZVZpZXdlci5tCisrKyBiL3NyYy9BcG9sbG9HYWxsZXJ5SW1hZ2VWaWV3ZXIubQpAQCAtMjgsNiArMjgsNyBAQAogc3RhdGljIE5TVGltZUludGVydmFsIGNvbnN0IGtBcG9sbG9HYWxsZXJ5Vmlld2VySG9sZEFjdGlvbnNEZWxheSA9IDAuMzsKIAogc3RhdGljIE5TU3RyaW5nICpjb25zdCBrQXBvbGxvR2FsbGVyeVZpZXdlckNlbGxJRCA9IEAiQXBvbGxvR2FsbGVyeVZpZXdlckNlbGwiOworc3RhdGljIE5TU3RyaW5nICpjb25zdCBrQXBvbGxvR2FsbGVyeVNsaWRlc2hvd0ludGVydmFsS2V5ID0gQCJBcG9sbG9SZWJvcm5HYWxsZXJ5U2xpZGVzaG93SW50ZXJ2YWwiOwogCiAvLyBQYWdlcyBkaXNwbGF5IHRocm91Z2ggRkxBbmltYXRlZEltYWdlVmlldyDigJQgYSBVSUltYWdlVmlldyBzdWJjbGFzcyBvdXQgb2YKIC8vIEFwb2xsbydzIG93biBidW5kbGVkIGZyYW1ld29yayDigJQgc28gYW4gYW5pbWF0ZWQgR0lGIHN0cmVhbXMgaXRzIGZyYW1lcwpAQCAtNTM2LDYgKzUzNywxMiBAQAogQHByb3BlcnR5IChub25hdG9taWMsIHN0cm9uZykgVUlWaWV3ICpkb25lSG9zdDsKIEBwcm9wZXJ0eSAobm9uYXRvbWljLCBzdHJvbmcpIFVJQnV0dG9uICpzaGFyZUJ1dHRvbjsKIEBwcm9wZXJ0eSAobm9uYXRvbWljLCBzdHJvbmcpIFVJVmlldyAqc2hhcmVIb3N0OworQHByb3BlcnR5IChub25hdG9taWMsIHN0cm9uZykgVUlCdXR0b24gKnNsaWRlc2hvd0J1dHRvbjsKK0Bwcm9wZXJ0eSAobm9uYXRvbWljLCBzdHJvbmcpIFVJVmlldyAqc2xpZGVzaG93SG9zdDsKK0Bwcm9wZXJ0eSAobm9uYXRvbWljLCBzdHJvbmcsIG51bGxhYmxlKSBOU1RpbWVyICpzbGlkZXNob3dUaW1lcjsKK0Bwcm9wZXJ0eSAobm9uYXRvbWljKSBCT09MIHNsaWRlc2hvd1J1bm5pbmc7CitAcHJvcGVydHkgKG5vbmF0b21pYykgTlNJbnRlZ2VyIHNsaWRlc2hvd1ZpZGVvQWR2YW5jZUluZGV4OworQHByb3BlcnR5IChub25hdG9taWMpIEJPT0wgc2xpZGVzaG93V2FpdGluZ0Zvck1vcmU7CiBAcHJvcGVydHkgKG5vbmF0b21pYywgc3Ryb25nKSBVSUJ1dHRvbiAqbXV0ZUJ1dHRvbjsKIEBwcm9wZXJ0eSAobm9uYXRvbWljLCBzdHJvbmcpIFVJVmlldyAqbXV0ZUhvc3Q7CiBAcHJvcGVydHkgKG5vbmF0b21pYywgc3Ryb25nKSBVSUxhYmVsICpjb3VudGVyTGFiZWw7CkBAIC02NDQsNiArNjUxLDggQEAKICAgICAgICAgX2Nocm9tZVZpc2libGUgPSBZRVM7CiAgICAgICAgIF9wcmVmZXRjaFJhZGl1cyA9IGtBcG9sbG9HYWxsZXJ5Vmlld2VyUHJlZmV0Y2hSYWRpdXM7CiAgICAgICAgIF92aWV3ZXJQcmVmZXRjaGVzID0gW05TTXV0YWJsZURpY3Rpb25hcnkgZGljdGlvbmFyeV07CisgICAgICAgIF9zbGlkZXNob3dWaWRlb0FkdmFuY2VJbmRleCA9IE5TTm90Rm91bmQ7CisgICAgICAgIF9zbGlkZXNob3dXYWl0aW5nRm9yTW9yZSA9IE5POwogICAgICAgICBzZWxmLm1vZGFsUHJlc2VudGF0aW9uU3R5bGUgPSBVSU1vZGFsUHJlc2VudGF0aW9uRnVsbFNjcmVlbjsKICAgICAgICAgc2VsZi5tb2RhbFByZXNlbnRhdGlvbkNhcHR1cmVzU3RhdHVzQmFyQXBwZWFyYW5jZSA9IFlFUzsKICAgICB9CkBAIC03NDYsNiArNzU1LDggQEAKICAgICAgICAgc2VsZi5pc0ZvcmNpYmx5Um90YXRlZCA9IE5POwogICAgICAgICBbc2VsZiBhcG9sbG9fcmVxdWVzdEludGVyZmFjZU9yaWVudGF0aW9uOlVJSW50ZXJmYWNlT3JpZW50YXRpb25Qb3J0cmFpdF07CiAgICAgfQorICAgIFtzZWxmLnNsaWRlc2hvd1RpbWVyIGludmFsaWRhdGVdOworICAgIHNlbGYuc2xpZGVzaG93VGltZXIgPSBuaWw7CiAgICAgLy8gTm90aGluZyBzaG91bGQga2VlcCBwbGF5aW5nIGJlaGluZCBvciBhZnRlciB0aGUgdmlld2VyLgogICAgIGZvciAoVUlDb2xsZWN0aW9uVmlld0NlbGwgKmNlbGwgaW4gc2VsZi5jb2xsZWN0aW9uVmlldy52aXNpYmxlQ2VsbHMpIHsKICAgICAgICAgaWYgKFtjZWxsIGlzTWVtYmVyT2ZDbGFzczpbQXBvbGxvR2FsbGVyeVZpZXdlckNlbGwgY2xhc3NdXSkgewpAQCAtOTIzLDYgKzkzNCwxMiBAQAogICAgIHNlbGYudG9hc3RQaWxsLmFscGhhID0gMC4wOwogICAgIFtzZWxmLnZpZXcgYWRkU3VidmlldzpzZWxmLnRvYXN0UGlsbF07CiAKKyAgICBzZWxmLnNsaWRlc2hvd0J1dHRvbiA9IEFwb2xsb0dhbGxlcnlDaHJvbWVCdXR0b24oQXBvbGxvR2FsbGVyeUNocm9tZVN5bWJvbChAInBsYXkuZmlsbCIpLCBuaWwsICZfc2xpZGVzaG93SG9zdCk7CisgICAgW3NlbGYuc2xpZGVzaG93QnV0dG9uIGFkZFRhcmdldDpzZWxmIGFjdGlvbjpAc2VsZWN0b3IoYXBvbGxvX3NsaWRlc2hvd1RhcHBlZCkgZm9yQ29udHJvbEV2ZW50czpVSUNvbnRyb2xFdmVudFRvdWNoVXBJbnNpZGVdOworICAgIHNlbGYuc2xpZGVzaG93QnV0dG9uLmFjY2Vzc2liaWxpdHlMYWJlbCA9IEAiU3RhcnQgU2xpZGVzaG93IjsKKyAgICBbc2VsZi52aWV3IGFkZFN1YnZpZXc6c2VsZi5zbGlkZXNob3dIb3N0XTsKKyAgICBbc2VsZiBhcG9sbG9fcmVidWlsZFNsaWRlc2hvd01lbnVdOworCiAgICAgW3NlbGYgYXBvbGxvX2J1aWxkVmlkZW9CYXJdOwogCiAgICAgc2VsZi5yb3RhdGVPZmZlckJ1dHRvbiA9IEFwb2xsb0dhbGxlcnlDaHJvbWVCdXR0b24oQXBvbGxvR2FsbGVyeUNocm9tZVN5bWJvbChAInJvdGF0ZS5yaWdodCIpLApAQCAtMTEyMyw3ICsxMTQwLDggQEAKIAogICAgIHNlbGYuZG9uZUhvc3QuZnJhbWUgPSBDR1JlY3RNYWtlKHNpZGUsIHRvcCwgNzQuMCwgY29udHJvbEhlaWdodCk7CiAgICAgc2VsZi5zaGFyZUhvc3QuZnJhbWUgPSBDR1JlY3RNYWtlKGJvdW5kcy5zaXplLndpZHRoIC0gcmlnaHRTaWRlIC0gaWNvblNpemUsIHRvcCwgaWNvblNpemUsIGNvbnRyb2xIZWlnaHQpOwotICAgIENHRmxvYXQgdHJhaWxpbmcgPSBDR1JlY3RHZXRNaW5YKHNlbGYuc2hhcmVIb3N0LmZyYW1lKTsKKyAgICBzZWxmLnNsaWRlc2hvd0hvc3QuZnJhbWUgPSBDR1JlY3RNYWtlKENHUmVjdEdldE1pblgoc2VsZi5zaGFyZUhvc3QuZnJhbWUpIC0gY29udHJvbEdhcCAtIGljb25TaXplLCB0b3AsIGljb25TaXplLCBjb250cm9sSGVpZ2h0KTsKKyAgICBDR0Zsb2F0IHRyYWlsaW5nID0gQ0dSZWN0R2V0TWluWChzZWxmLnNsaWRlc2hvd0hvc3QuZnJhbWUpOwogICAgIGlmICghc2VsZi5tdXRlSG9zdC5oaWRkZW4pIHsKICAgICAgICAgc2VsZi5tdXRlSG9zdC5mcmFtZSA9IENHUmVjdE1ha2UodHJhaWxpbmcgLSBjb250cm9sR2FwIC0gaWNvblNpemUsIHRvcCwgaWNvblNpemUsIGNvbnRyb2xIZWlnaHQpOwogICAgICAgICB0cmFpbGluZyA9IENHUmVjdEdldE1pblgoc2VsZi5tdXRlSG9zdC5mcmFtZSk7CkBAIC0xMjU3LDcgKzEyNzUsMTcgQEAKICAgICAgICAgW3BsYXllciBhZGRQZXJpb2RpY1RpbWVPYnNlcnZlckZvckludGVydmFsOkNNVGltZU1ha2UoMSwgNCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHF1ZXVlOmRpc3BhdGNoX2dldF9tYWluX3F1ZXVlKCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1c2luZ0Jsb2NrOl4oQ01UaW1lIHRpbWUpIHsKLSAgICAgICAgW3dlYWtTZWxmIGFwb2xsb19yZWZyZXNoVmlkZW9CYXJOb3ddOworICAgICAgICB0eXBlb2Yoc2VsZikgc3Ryb25nU2VsZiA9IHdlYWtTZWxmOworICAgICAgICBbc3Ryb25nU2VsZiBhcG9sbG9fcmVmcmVzaFZpZGVvQmFyTm93XTsKKyAgICAgICAgaWYgKHN0cm9uZ1NlbGYuc2xpZGVzaG93UnVubmluZyAmJiBbc3Ryb25nU2VsZiBhcG9sbG9fY3VycmVudEl0ZW1dLnBsYXlzQXNWaWRlbykgeworICAgICAgICAgICAgTlNUaW1lSW50ZXJ2YWwgZHVyYXRpb24gPSBbc3Ryb25nU2VsZiBhcG9sbG9fY3VycmVudFZpZGVvRHVyYXRpb25dOworICAgICAgICAgICAgTlNUaW1lSW50ZXJ2YWwgY3VycmVudCA9IENNVGltZUdldFNlY29uZHModGltZSk7CisgICAgICAgICAgICBpZiAoZHVyYXRpb24gPiAwLjAgJiYgaXNmaW5pdGUoY3VycmVudCkgJiYgY3VycmVudCA+PSBkdXJhdGlvbiAtIDAuMjAgJiYKKyAgICAgICAgICAgICAgICBzdHJvbmdTZWxmLnNsaWRlc2hvd1ZpZGVvQWR2YW5jZUluZGV4ICE9IHN0cm9uZ1NlbGYuY3VycmVudEluZGV4KSB7CisgICAgICAgICAgICAgICAgc3Ryb25nU2VsZi5zbGlkZXNob3dWaWRlb0FkdmFuY2VJbmRleCA9IHN0cm9uZ1NlbGYuY3VycmVudEluZGV4OworICAgICAgICAgICAgICAgIFtzdHJvbmdTZWxmIGFwb2xsb19hZHZhbmNlU2xpZGVzaG93XTsKKyAgICAgICAgICAgIH0KKyAgICAgICAgfQogICAgICAgICAodm9pZCl0aW1lOwogICAgIH1dOwogICAgIFtzZWxmIGFwb2xsb19yZWZyZXNoVmlkZW9CYXJOb3ddOwpAQCAtMTQ0MSw2ICsxNDY5LDcgQEAKICAgICB2b2lkICheY2hhbmdlcykodm9pZCkgPSBeewogICAgICAgICBzZWxmLmRvbmVIb3N0LmFscGhhID0gYWxwaGE7CiAgICAgICAgIHNlbGYuc2hhcmVIb3N0LmFscGhhID0gYWxwaGE7CisgICAgICAgIHNlbGYuc2xpZGVzaG93SG9zdC5hbHBoYSA9IGFscGhhOwogICAgICAgICBzZWxmLm11dGVIb3N0LmFscGhhID0gYWxwaGE7CiAgICAgICAgIHNlbGYuY291bnRlclBpbGwuYWxwaGEgPSBhbHBoYTsKICAgICAgICAgc2VsZi5pbmZvUGFuZWwuYWxwaGEgPSBhbHBoYTsKQEAgLTE0NDgsNiArMTQ3Nyw3IEBACiAgICAgfTsKICAgICBzZWxmLmRvbmVIb3N0LnVzZXJJbnRlcmFjdGlvbkVuYWJsZWQgPSB2aXNpYmxlOwogICAgIHNlbGYuc2hhcmVIb3N0LnVzZXJJbnRlcmFjdGlvbkVuYWJsZWQgPSB2aXNpYmxlOworICAgIHNlbGYuc2xpZGVzaG93SG9zdC51c2VySW50ZXJhY3Rpb25FbmFibGVkID0gdmlzaWJsZTsKICAgICBzZWxmLm11dGVIb3N0LnVzZXJJbnRlcmFjdGlvbkVuYWJsZWQgPSB2aXNpYmxlOwogICAgIHNlbGYuaW5mb1BhbmVsLnVzZXJJbnRlcmFjdGlvbkVuYWJsZWQgPSB2aXNpYmxlOwogICAgIHNlbGYudmlkZW9CYXJQaWxsLnVzZXJJbnRlcmFjdGlvbkVuYWJsZWQgPSB2aXNpYmxlOwpAQCAtMTUyOCw2ICsxNTU4LDcgQEAKICAgICBbc2VsZiBhcG9sbG9fc3luY1BsYXliYWNrXTsKICAgICBbc2VsZiBhcG9sbG9fcHJlZmV0Y2hBcm91bmRJbmRleDpwYWdlXTsKICAgICBbc2VsZiBhcG9sbG9fbG9hZE1vcmVJZk5lZWRlZF07CisgICAgaWYgKHNlbGYuc2xpZGVzaG93UnVubmluZykgW3NlbGYgYXBvbGxvX3NjaGVkdWxlU2xpZGVzaG93Rm9yQ3VycmVudEl0ZW1dOwogfQogCiAvLyBFeGFjdGx5IG9uZSBwYWdlIHBsYXlzIGF0IGEgdGltZTogZXZlcnkgb3RoZXIgdmlzaWJsZSBjZWxsICh0aGUgbmVpZ2hib3VycyBhCkBAIC0xNjM5LDYgKzE2NzAsMTAzIEBACiAgICAgICAgIFtzZWxmLmNvbGxlY3Rpb25WaWV3IGluc2VydEl0ZW1zQXRJbmRleFBhdGhzOmluZGV4UGF0aHNdOwogICAgIH0gY29tcGxldGlvbjpuaWxdOwogICAgIFtzZWxmIGFwb2xsb191cGRhdGVDaHJvbWVDb250ZW50XTsKKyAgICBpZiAoc2VsZi5zbGlkZXNob3dSdW5uaW5nICYmIHNlbGYuc2xpZGVzaG93V2FpdGluZ0Zvck1vcmUgJiYgdG90YWwgPiBzZWxmLmN1cnJlbnRJbmRleCArIDEpIHsKKyAgICAgICAgc2VsZi5zbGlkZXNob3dXYWl0aW5nRm9yTW9yZSA9IE5POworICAgICAgICBbc2VsZiBhcG9sbG9fYWR2YW5jZVNsaWRlc2hvd107CisgICAgfQorfQorCisjcHJhZ21hIG1hcmsgU2xpZGVzaG93CisKKy0gKE5TVGltZUludGVydmFsKWFwb2xsb19zbGlkZXNob3dJbnRlcnZhbCB7CisgICAgZG91YmxlIHZhbHVlID0gW1tOU1VzZXJEZWZhdWx0cyBzdGFuZGFyZFVzZXJEZWZhdWx0c10gZG91YmxlRm9yS2V5OmtBcG9sbG9HYWxsZXJ5U2xpZGVzaG93SW50ZXJ2YWxLZXldOworICAgIGlmICh2YWx1ZSA8IDEuMCB8fCB2YWx1ZSA+IDUuMCkgdmFsdWUgPSAzLjA7CisgICAgcmV0dXJuIHZhbHVlOworfQorCistICh2b2lkKWFwb2xsb19zZXRTbGlkZXNob3dJbnRlcnZhbDooTlNUaW1lSW50ZXJ2YWwpaW50ZXJ2YWwgeworICAgIGludGVydmFsID0gTUFYKDEuMCwgTUlOKGludGVydmFsLCA1LjApKTsKKyAgICBbW05TVXNlckRlZmF1bHRzIHN0YW5kYXJkVXNlckRlZmF1bHRzXSBzZXREb3VibGU6aW50ZXJ2YWwgZm9yS2V5OmtBcG9sbG9HYWxsZXJ5U2xpZGVzaG93SW50ZXJ2YWxLZXldOworICAgIFtzZWxmIGFwb2xsb19yZWJ1aWxkU2xpZGVzaG93TWVudV07CisgICAgaWYgKHNlbGYuc2xpZGVzaG93UnVubmluZykgW3NlbGYgYXBvbGxvX3NjaGVkdWxlU2xpZGVzaG93Rm9yQ3VycmVudEl0ZW1dOworfQorCistICh2b2lkKWFwb2xsb19yZWJ1aWxkU2xpZGVzaG93TWVudSB7CisgICAgTlNNdXRhYmxlQXJyYXk8VUlNZW51RWxlbWVudCAqPiAqYWN0aW9ucyA9IFtOU011dGFibGVBcnJheSBhcnJheV07CisgICAgTlNUaW1lSW50ZXJ2YWwgc2VsZWN0ZWQgPSBbc2VsZiBhcG9sbG9fc2xpZGVzaG93SW50ZXJ2YWxdOworICAgIF9fd2VhayB0eXBlb2Yoc2VsZikgd2Vha1NlbGYgPSBzZWxmOworICAgIGZvciAoTlNJbnRlZ2VyIHNlY29uZHMgPSAxOyBzZWNvbmRzIDw9IDU7IHNlY29uZHMrKykgeworICAgICAgICBVSUFjdGlvbiAqYWN0aW9uID0gW1VJQWN0aW9uIGFjdGlvbldpdGhUaXRsZTpbTlNTdHJpbmcgc3RyaW5nV2l0aEZvcm1hdDpAIiVsZCBzZWNvbmRzIiwgKGxvbmcpc2Vjb25kc10KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaW1hZ2U6bmlsCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpZGVudGlmaWVyOm5pbAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaGFuZGxlcjpeKF9fa2luZG9mIFVJQWN0aW9uICphKSB7CisgICAgICAgICAgICBbd2Vha1NlbGYgYXBvbGxvX3NldFNsaWRlc2hvd0ludGVydmFsOihOU1RpbWVJbnRlcnZhbClzZWNvbmRzXTsKKyAgICAgICAgICAgICh2b2lkKWE7CisgICAgICAgIH1dOworICAgICAgICBpZiAoKE5TSW50ZWdlcilsbHJvdW5kKHNlbGVjdGVkKSA9PSBzZWNvbmRzKSBhY3Rpb24uc3RhdGUgPSBVSU1lbnVFbGVtZW50U3RhdGVPbjsKKyAgICAgICAgW2FjdGlvbnMgYWRkT2JqZWN0OmFjdGlvbl07CisgICAgfQorICAgIHNlbGYuc2xpZGVzaG93QnV0dG9uLm1lbnUgPSBbVUlNZW51IG1lbnVXaXRoVGl0bGU6QCJTbGlkZXNob3cgU3BlZWQiIGNoaWxkcmVuOmFjdGlvbnNdOworfQorCistICh2b2lkKWFwb2xsb19zbGlkZXNob3dUYXBwZWQgeworICAgIHNlbGYuc2xpZGVzaG93UnVubmluZyA9ICFzZWxmLnNsaWRlc2hvd1J1bm5pbmc7CisgICAgc2VsZi5zbGlkZXNob3dXYWl0aW5nRm9yTW9yZSA9IE5POworICAgIHNlbGYuc2xpZGVzaG93VmlkZW9BZHZhbmNlSW5kZXggPSBOU05vdEZvdW5kOworICAgIFtzZWxmLnNsaWRlc2hvd1RpbWVyIGludmFsaWRhdGVdOworICAgIHNlbGYuc2xpZGVzaG93VGltZXIgPSBuaWw7CisgICAgW3NlbGYuc2xpZGVzaG93QnV0dG9uIHNldEltYWdlOkFwb2xsb0dhbGxlcnlDaHJvbWVTeW1ib2woc2VsZi5zbGlkZXNob3dSdW5uaW5nID8gQCJwYXVzZS5maWxsIiA6IEAicGxheS5maWxsIikKKyAgICAgICAgICAgICAgICAgICAgICAgICAgIGZvclN0YXRlOlVJQ29udHJvbFN0YXRlTm9ybWFsXTsKKyAgICBzZWxmLnNsaWRlc2hvd0J1dHRvbi5hY2Nlc3NpYmlsaXR5TGFiZWwgPSBzZWxmLnNsaWRlc2hvd1J1bm5pbmcgPyBAIlBhdXNlIFNsaWRlc2hvdyIgOiBAIlN0YXJ0IFNsaWRlc2hvdyI7CisgICAgaWYgKHNlbGYuc2xpZGVzaG93UnVubmluZykgeworICAgICAgICBbc2VsZiBhcG9sbG9fc2hvd1RvYXN0OltOU1N0cmluZyBzdHJpbmdXaXRoRm9ybWF0OkAiU2xpZGVzaG93IMK3ICUuMGZzIiwgW3NlbGYgYXBvbGxvX3NsaWRlc2hvd0ludGVydmFsXV1dOworICAgICAgICBbc2VsZiBhcG9sbG9fc2NoZWR1bGVTbGlkZXNob3dGb3JDdXJyZW50SXRlbV07CisgICAgfQorfQorCistICh2b2lkKWFwb2xsb19zY2hlZHVsZVNsaWRlc2hvd0ZvckN1cnJlbnRJdGVtIHsKKyAgICBbc2VsZi5zbGlkZXNob3dUaW1lciBpbnZhbGlkYXRlXTsKKyAgICBzZWxmLnNsaWRlc2hvd1RpbWVyID0gbmlsOworICAgIHNlbGYuc2xpZGVzaG93VmlkZW9BZHZhbmNlSW5kZXggPSBOU05vdEZvdW5kOworICAgIGlmICghc2VsZi5zbGlkZXNob3dSdW5uaW5nKSByZXR1cm47CisgICAgQXBvbGxvR2FsbGVyeUl0ZW0gKml0ZW0gPSBbc2VsZiBhcG9sbG9fY3VycmVudEl0ZW1dOworICAgIGlmICghaXRlbSkgcmV0dXJuOworICAgIGlmIChpdGVtLnBsYXlzQXNWaWRlbykgeworICAgICAgICBbc2VsZiBhcG9sbG9fc3luY1BsYXliYWNrXTsKKyAgICAgICAgcmV0dXJuOworICAgIH0KKyAgICBzZWxmLnNsaWRlc2hvd1RpbWVyID0gW05TVGltZXIgc2NoZWR1bGVkVGltZXJXaXRoVGltZUludGVydmFsOltzZWxmIGFwb2xsb19zbGlkZXNob3dJbnRlcnZhbF0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFyZ2V0OnNlbGYKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNlbGVjdG9yOkBzZWxlY3RvcihhcG9sbG9fc2xpZGVzaG93VGltZXJGaXJlZDopCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1c2VySW5mbzpuaWwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZXBlYXRzOk5PXTsKK30KKworLSAodm9pZClhcG9sbG9fc2xpZGVzaG93VGltZXJGaXJlZDooTlNUaW1lciAqKXRpbWVyIHsKKyAgICBpZiAodGltZXIgIT0gc2VsZi5zbGlkZXNob3dUaW1lciB8fCAhc2VsZi5zbGlkZXNob3dSdW5uaW5nKSByZXR1cm47CisgICAgc2VsZi5zbGlkZXNob3dUaW1lciA9IG5pbDsKKyAgICBbc2VsZiBhcG9sbG9fYWR2YW5jZVNsaWRlc2hvd107Cit9CisKKy0gKHZvaWQpYXBvbGxvX2FkdmFuY2VTbGlkZXNob3cgeworICAgIGlmICghc2VsZi5zbGlkZXNob3dSdW5uaW5nIHx8IHNlbGYuaXNEaXNtaXNzaW5nKSByZXR1cm47CisgICAgTlNJbnRlZ2VyIHRvdGFsID0gKE5TSW50ZWdlcilzZWxmLmZlZWQuaXRlbXMuY291bnQ7CisgICAgaWYgKHNlbGYuY3VycmVudEluZGV4ICsgMSA8IHRvdGFsKSB7CisgICAgICAgIE5TSW50ZWdlciBuZXh0ID0gc2VsZi5jdXJyZW50SW5kZXggKyAxOworICAgICAgICBOU0luZGV4UGF0aCAqcGF0aCA9IFtOU0luZGV4UGF0aCBpbmRleFBhdGhGb3JJdGVtOm5leHQgaW5TZWN0aW9uOjBdOworICAgICAgICBbc2VsZi5jb2xsZWN0aW9uVmlldyBzY3JvbGxUb0l0ZW1BdEluZGV4UGF0aDpwYXRoIGF0U2Nyb2xsUG9zaXRpb246VUlDb2xsZWN0aW9uVmlld1Njcm9sbFBvc2l0aW9uQ2VudGVyZWRIb3Jpem9udGFsbHkgYW5pbWF0ZWQ6WUVTXTsKKyAgICAgICAgcmV0dXJuOworICAgIH0KKyAgICBpZiAoIXNlbGYuZmVlZC5pc0V4aGF1c3RlZCkgeworICAgICAgICBzZWxmLnNsaWRlc2hvd1dhaXRpbmdGb3JNb3JlID0gWUVTOworICAgICAgICBbc2VsZiBhcG9sbG9fbG9hZE1vcmVJZk5lZWRlZF07CisgICAgICAgIHJldHVybjsKKyAgICB9CisgICAgLy8gRW5kIG9mIHRoZSBhY3R1YWwgZmVlZDogbG9vcCBvbmx5IGFmdGVyIEFwb2xsbyBzYXlzIHRoZXJlIGlzIG5vIG1vcmUuCisgICAgaWYgKHRvdGFsID4gMCkgeworICAgICAgICBOU0luZGV4UGF0aCAqZmlyc3QgPSBbTlNJbmRleFBhdGggaW5kZXhQYXRoRm9ySXRlbTowIGluU2VjdGlvbjowXTsKKyAgICAgICAgW3NlbGYuY29sbGVjdGlvblZpZXcgc2Nyb2xsVG9JdGVtQXRJbmRleFBhdGg6Zmlyc3QgYXRTY3JvbGxQb3NpdGlvbjpVSUNvbGxlY3Rpb25WaWV3U2Nyb2xsUG9zaXRpb25DZW50ZXJlZEhvcml6b250YWxseSBhbmltYXRlZDpZRVNdOworICAgIH0KIH0KIAogI3ByYWdtYSBtYXJrIEdlc3R1cmVzCg=="
+        run: |
+          set -euo pipefail
+          printf "%s" "$APOLLO_SLIDESHOW_PATCH_B64" | base64 --decode > "$RUNNER_TEMP/gallery-slideshow.patch"
+          cd "$RUNNER_TEMP/Apollo-Reborn"
+          git apply --check "$RUNNER_TEMP/gallery-slideshow.patch"
+          git apply "$RUNNER_TEMP/gallery-slideshow.patch"
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install ldid dpkg make
+          echo "$(brew --prefix make)/libexec/gnubin" >> "$GITHUB_PATH"
+
+      - name: Install Theos on runner
+        uses: actions/checkout@v4
+        with:
+          repository: theos/theos
+          ref: 9bc73406cf80b711ef4d02c15ff1dedc4478a275
+          path: theos
+          submodules: recursive
+
+      - name: Select Xcode
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d /Applications/Xcode_26.0.1.app ]; then
+            sudo xcode-select -s /Applications/Xcode_26.0.1.app
+          else
+            XCODE_APP=$(find /Applications -maxdepth 1 -type d -name 'Xcode_26*.app' | sort | tail -1)
+            if [ -z "$XCODE_APP" ]; then
+              echo "No Xcode 26 installation found on this GitHub runner."
+              exit 1
+            fi
+            sudo xcode-select -s "$XCODE_APP"
+          fi
+          xcodebuild -version
+
+      - name: Build modified Apollo Reborn tweak
+        working-directory: ${{ runner.temp }}/Apollo-Reborn
+        shell: bash
+        env:
+          THEOS: ${{ github.workspace }}/theos
+        run: |
+          set -euo pipefail
+          make clean
+          make package FINALPACKAGE=1
+          ls -lh packages/*.deb
+
+      - name: Download prepared Apollo base IPA
+        working-directory: ${{ runner.temp }}/Apollo-Reborn
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 \
+            https://github.com/Apollo-Reborn/Apollo-Reborn/releases/download/v1.15.11_3.8.5/Apollo-Reborn-3.8.5-GLASS-NOEXTENSIONS.ipa \
+            -o Apollo.ipa
+          unzip -t Apollo.ipa >/dev/null
+
+      - name: Build Gallery Slideshow IPA
+        working-directory: ${{ runner.temp }}/Apollo-Reborn
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEB_PATH=$(ls -1t packages/*.deb | head -1)
+          mkdir -p dist
+          ./build-ipa.sh \
+            --ipa ./Apollo.ipa \
+            --deb "$DEB_PATH" \
+            -o ./dist/Apollo-Reborn-3.8.5-GallerySlideshow.ipa
+          unzip -t ./dist/Apollo-Reborn-3.8.5-GallerySlideshow.ipa >/dev/null
+          ls -lh ./dist/Apollo-Reborn-3.8.5-GallerySlideshow.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Apollo-Reborn-3.8.5-GallerySlideshow
+          path: ${{ runner.temp }}/Apollo-Reborn/dist/Apollo-Reborn-3.8.5-GallerySlideshow.ipa
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Build summary
+        shell: bash
+        run: |
+          echo "## Apollo Gallery Slideshow IPA built" >> "$GITHUB_STEP_SUMMARY"
+          echo "Download the **Apollo-Reborn-3.8.5-GallerySlideshow** artifact below this workflow run." >> "$GITHUB_STEP_SUMMARY"
